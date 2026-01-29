@@ -1,0 +1,13 @@
+{
+  "name": "openbrowserai",
+  "version": "1.0.0",
+  "description": "OpenBrowserAI - Open source Browser AI Agent",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
