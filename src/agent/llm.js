@@ -2,8 +2,10 @@ const { ChatGoogleGenerativeAI } = require("@langchain/google-genai");
 const { ChatOllama } = require("@langchain/ollama");
 const { OpenRouter } = require("@openrouter/sdk");
 const dotenv = require('dotenv');
+const {Reasoning, None} =require('@openrouter/sdk/types')
 const fs = require('fs');
 const path = require('path');
+const { Opik } = require("opik");
 dotenv.config();
 
 
@@ -13,30 +15,39 @@ const cerebras = new Cerebras({
   apiKey: process.env['CEREBRAS_API_KEY']
 });
 
+const opikClient = new Opik();
+
 async function cere(prompt, visionData) {
+  const trace = opikClient.trace({
+    name: "Cerebras LLM Call",
+    input: { prompt: prompt.substring(0, 1000), useVision: visionData.useVision },
+  });
+
   const completion = await cerebras.chat.completions.create({
     messages: [
         visionData.useVision && visionData.image 
       ? { role: "user", content: [
           { type: "text", text: prompt },
-          { type: "image", source: { type: "base64", data: image } }
-          // { type: "image_url", image_url: { url: image } }
+          { type: "image", source: { type: "base64", data: visionData.image } }
         ]}
       : { role: "user", content: prompt }
     ],
     
     model: 'gpt-oss-120b',
-    // max_completion_tokens: 1024,
     temperature: 0,
-    // top_p: 1,
     stream: false
   });
 
-  // console.log(completion.choices[0].message)
+  const response = completion.choices[0].message.content;
 
-  return completion.choices[0].message.content
+  trace.end({
+    output: { response: response, model: 'gpt-oss-120b' },
+  });
+
+  await opikClient.flush();
+
+  return response;
 }
-
 
 function convertPrompt(res1) {
   // const res1 ={action, summary, infoCollected, status}
@@ -148,6 +159,8 @@ function saveObjectToJsonFile(obj, filename) {
 async function gemini(prompt, visionData = {useVision : false, image: null}) {
   console.log("gemini1", prompt.length);
 
+  
+
   let llm;
   const provider = process.env.LLM_PROVIDER || 'gemini';
   console.log("Provider detected:", provider);
@@ -166,6 +179,10 @@ async function gemini(prompt, visionData = {useVision : false, image: null}) {
     
     const hf = new HfInference(process.env.HF_TOKEN || process.env.HUGGINGFACE_API_KEY);
     
+
+
+
+
     
     // await saveObjectToJsonFile({prompt:prompt}, "zzz.json")
     const completion = await hf.chatCompletion({
@@ -184,6 +201,12 @@ async function gemini(prompt, visionData = {useVision : false, image: null}) {
             : prompt + "Dont call or use your tool (tool_choice)."
         }
 
+
+        // { role: "system", content: "Reasoning: low" },
+        // {
+        //   role: 'user',
+        //   content: prompt + "Dont call or use your tool (tool_choice).",
+        // },
       ],
       
       tools: [],
@@ -205,7 +228,8 @@ async function gemini(prompt, visionData = {useVision : false, image: null}) {
     });
 
     const completion = await client.chat.send({
-      model: process.env.OPENROUTER_MODEL || "openai/gpt-oss-20b",
+      // "deepseek/deepseek-v3.2" , "meta-llama/llama-3.3-70b-instruct"  "openai/gpt-oss-20b" openai/gpt-oss-safeguard-20b
+      model: process.env.OPENROUTER_MODEL || "openai/gpt-oss-20b",//"moonshotai/kimi-k2-0905",//"openai/gpt-oss-20b",//"qwen/qwen-2.5-7b-instruct",//"qwen/qwq-32b",// "deepseek/deepseek-v3.2", //"tngtech/deepseek-r1t-chimera:free", // "meta-llama/llama-3.2-3b-instruct:free", // qwen/qwen3-embedding-8b
       messages: [
         {
           role: 'user',
@@ -250,9 +274,7 @@ async function gemini(prompt, visionData = {useVision : false, image: null}) {
 
 
         ]]]
-      : [["user", prompt]],
-      
-      
+      : [["user", prompt]]
 
     );
 
@@ -267,8 +289,22 @@ async function gemini(prompt, visionData = {useVision : false, image: null}) {
   jsonObject = convertPrompt(jsonObject)
   console.log("gemini4");
 
+  const trace = opikClient.trace({
+    name: "LLM Call",
+    input: { prompt: prompt.substring(0, 1000), useVision: visionData.useVision },
+    output: { response: jsonObject, provider: provider },
+  });
+  trace.end(
+    // {
+    //   output: { response: jsonObject, provider: provider },
+    // }
+  );
+
+  await opikClient.flush();
+
   return jsonObject;
 }
+
 
 module.exports = {
   gemini
