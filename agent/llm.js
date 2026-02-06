@@ -5,7 +5,6 @@ const dotenv = require('dotenv');
 const {Reasoning, None} =require('@openrouter/sdk/types')
 const fs = require('fs');
 const path = require('path');
-const { Opik } = require("opik");
 dotenv.config();
 
 
@@ -15,13 +14,15 @@ const cerebras = new Cerebras({
   apiKey: process.env['CEREBRAS_API_KEY']
 });
 
-const opikClient = new Opik();
-
-async function cere(prompt, visionData) {
-  const trace = opikClient.trace({
-    name: "Cerebras LLM Call",
-    input: { prompt: prompt.substring(0, 1000), useVision: visionData.useVision },
-  });
+async function cere(prompt, visionData, parentTrace) {
+  let span;
+  // if (parentTrace) {
+  //   span = parentTrace.span({
+  //     name: "Cerebras LLM Call",
+  //     input: { prompt: prompt.substring(0, 1000), useVision: visionData.useVision },
+  //     type: "llm"
+  //   });
+  // }
 
   const completion = await cerebras.chat.completions.create({
     messages: [
@@ -40,11 +41,11 @@ async function cere(prompt, visionData) {
 
   const response = completion.choices[0].message.content;
 
-  trace.end({
-    output: { response: response, model: 'gpt-oss-120b' },
-  });
-
-  await opikClient.flush();
+  if (span) {
+    span.end({
+      output: { response: response, model: 'gpt-oss-120b' },
+    });
+  }
 
   return response;
 }
@@ -156,7 +157,7 @@ function saveObjectToJsonFile(obj, filename) {
   console.log("Saved:", filePath);
 }
 
-async function gemini(prompt, visionData = {useVision : false, image: null}) {
+async function gemini(prompt, visionData = {useVision : false, image: null}, parentTrace) {
   console.log("gemini1", prompt.length);
 
   
@@ -169,10 +170,10 @@ async function gemini(prompt, visionData = {useVision : false, image: null}) {
     // await saveObjectToJsonFile({prompt:prompt}, "zzz.json")
 
     if(provider === 'cera'){
-       const res = await cere(prompt, visionData)
+       const res = await cere(prompt, visionData, parentTrace)
         text = res || ""
 
-    } else 
+    } else
       if (provider === 'huggingface') {
     console.log("Using Hugging Face");
     const { HfInference } = require('@huggingface/inference');
@@ -289,18 +290,15 @@ async function gemini(prompt, visionData = {useVision : false, image: null}) {
   jsonObject = convertPrompt(jsonObject)
   console.log("gemini4");
 
-  const trace = opikClient.trace({
-    name: "LLM Call",
-    input: { prompt: prompt.substring(0, 1000), useVision: visionData.useVision },
-    output: { response: jsonObject, provider: provider },
-  });
-  trace.end(
-    // {
-    //   output: { response: jsonObject, provider: provider },
-    // }
-  );
-
-  await opikClient.flush();
+  if (parentTrace) {
+    const span = parentTrace.span({
+      name: "LLM Call",
+      input: { prompt: prompt.substring(0, 1000), useVision: visionData.useVision },
+      output: { response: jsonObject, provider: provider },
+      type: "llm"
+    });
+    span.end();
+  }
 
   return jsonObject;
 }

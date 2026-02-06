@@ -409,20 +409,29 @@ async createNewTab(url=null) {
 
 
 
-async function executeActions(actions, browserController, privateData) {
+async function executeActions(actions, browserController, privateData, parentTrace) {
   let pageNo = null
   let page = null
   let chunk = 0
 
   const actionLogs = [];
     for (const action of actions) {
+        let span = null;
         
         // if(page)await page.mouse.move(300, 400, { steps: 20 });
         switch (action.type) {
             case 'getPageDataChunk':
                   actionLogs.push(`retrived ${action.chunk}th of page data.`);
                   chunk = action.chunk
+                  break;
             case 'click':
+                if (parentTrace) {
+                  span = parentTrace.span({
+                    name: "Browser Action: Click",
+                    input: { elementId: action.id, tab: action.tabOnWhichToPerform, x: action.x, y: action.y },
+                    type: "tool"
+                  });
+                }
                 page = browserController.pages[action.tabOnWhichToPerform -1 ]
                 pageNo = action.tabOnWhichToPerform 
                 if (action.x !== undefined && action.y !== undefined) {
@@ -432,9 +441,17 @@ async function executeActions(actions, browserController, privateData) {
                     await browserController.click(page, _x, _y);
                     actionLogs.push(`performed 'click' with params { id : ${action.id}, tab: ${action.tabOnWhichToPerform} }`);
                 }
+                if (span) span.end({ output: { success: true } });
                 break;
 
             case 'type':
+                if (parentTrace) {
+                  span = parentTrace.span({
+                    name: "Browser Action: Type",
+                    input: { elementId: action.id, tab: action.tabOnWhichToPerform, hasPrivateData: !!action.privateDataKeyName },
+                    type: "tool"
+                  });
+                }
                 page = browserController.pages[action.tabOnWhichToPerform-1 ]
                 pageNo = action.tabOnWhichToPerform
 
@@ -465,16 +482,32 @@ async function executeActions(actions, browserController, privateData) {
                     const maskedText = action.privateDataKeyName ? '[PRIVATE]' : textToType;
                     actionLogs.push(`performed 'type' with params { text: "${maskedText}", tab: ${action.tabOnWhichToPerform} }`);
                 }
+                if (span) span.end({ output: { success: true } });
                 break;
 
             case 'openNewTab':
+                if (parentTrace) {
+                  span = parentTrace.span({
+                    name: "Browser Action: OpenNewTab",
+                    input: { url: action.url },
+                    type: "tool"
+                  });
+                }
                 const newTabNumber = await browserController.createNewTab(action.url);
                 pageNo = newTabNumber;
                 console.log("pageNo ", pageNo)
                 actionLogs.push(`performed 'openNewTab' with params { newTabNumber: ${pageNo} }`);
+                if (span) span.end({ output: { success: true, newTabNumber } });
                 break;
 
             case 'search':
+                if (parentTrace) {
+                  span = parentTrace.span({
+                    name: "Browser Action: Navigate",
+                    input: { url: action.url, tab: action.tabOnWhichToPerform },
+                    type: "tool"
+                  });
+                }
                 page = browserController.pages[action.tabOnWhichToPerform-1 ]
                 pageNo = action.tabOnWhichToPerform
                 if (action.url !== undefined) {
@@ -482,6 +515,7 @@ async function executeActions(actions, browserController, privateData) {
                     await browserController.goto(currentPage, action.url);
                     actionLogs.push(`performed 'search' with params { url: "${action.url}", tab: ${action.tabOnWhichToPerform} }`);
                 }
+                if (span) span.end({ output: { success: true } });
                 break;
 
             default:
