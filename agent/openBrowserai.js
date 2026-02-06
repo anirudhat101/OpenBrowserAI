@@ -18,10 +18,10 @@ const {
 const { Opik } = require("opik");
 const opikClient = new Opik();
 
-async function OpenBrowserAI(){
+async function OpenBrowserAI(task){
   // const task = "check the price of eth on coingecko. if its price is greater than $6000 then open trading view chart of eth/usdt binace perp. else check price of BTC on coinmarketcap and see it its price is greater than $100000 if yes then open btc goolgle price page else open excalidraw."
   // const task = "check the price of eth on coingecko then check price on coinmarketcap"
-  const task = "Find a volunteer opportunity for beach cleanup in Mumbai"
+  // const task = "Find a volunteer opportunity for beach cleanup in Mumbai"
   const useVision = true
   let isDone = false 
   const privateData ={
@@ -65,7 +65,7 @@ async function OpenBrowserAI(){
       useVision: false,
       image: null 
   }
-
+  let finalAnswer
   while (!isDone){
     stepsCounter++
     console.log("creating prompt")
@@ -92,6 +92,7 @@ async function OpenBrowserAI(){
     if(res.isWholegoalFinish){
       stepSpan.end({ output: { status: "completed" } });
       isDone = true
+      finalAnswer = res.answer
       break
     }
     // if(res.actions.length <=0){
@@ -210,6 +211,8 @@ async function OpenBrowserAI(){
     }
   });
   await opikClient.flush();
+
+  return finalAnswer 
 }
 
 async function measureTime(fn) {
@@ -222,5 +225,8 @@ async function measureTime(fn) {
 
   return result;
 }
-measureTime(OpenBrowserAI)
+// measureTime(OpenBrowserAI)
+
+module.exports = { OpenBrowserAI };
+
 
