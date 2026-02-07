@@ -150,7 +150,7 @@ async function OpenBrowserAI(task){
         actionsLog.push(..._actionLog)
         pageNo = _pageno
         
-        await b.pages[pageNo-1].bringToFront(); // todo : remove (we should listen to new page addition state change)
+        // await b.pages[pageNo-1].bringToFront(); // todo : remove (we should listen to new page addition state change)
         console.log("performed")
 
       }

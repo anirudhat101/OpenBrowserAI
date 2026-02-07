@@ -251,7 +251,7 @@ async initialize(headless = false) {
           ]
         });
         const context = await this.browser.newContext(
-          { viewport: null }
+          // { viewport: null }
           
         );
         this.context = context;
@@ -325,7 +325,7 @@ async createNewTab(url=null) {
       this.syncPageData();
       
       if(url){
-        await _page.goto(url);
+        await _page.goto(url, { waitUntil: "domcontentloaded" });
         await this.wait(500);
       }
       
@@ -368,8 +368,13 @@ async createNewTab(url=null) {
     }
 
     async click(page, x, y, button = 'left') {
+      
+        // const el = page.locator(`#${CSS.escape(id)}`);
+        // await el.click();
+        // await page.waitForLoadState("domcontentloaded");
         // if (this.page) {
             await page.mouse.click(x, y, { button });
+            // await page.waitForLoadState("domcontentloaded");
         // }
     }
 
@@ -435,7 +440,8 @@ async function executeActions(actions, browserController, privateData, parentTra
                 page = browserController.pages[action.tabOnWhichToPerform -1 ]
                 pageNo = action.tabOnWhichToPerform 
                 if (action.x !== undefined && action.y !== undefined) {
-                    const _x = action.x + action.w / 2
+                  console.log("---------undefined---------")    
+                  const _x = action.x + action.w / 2
                     const _y = action.y + action.h / 2
                     console.log("click cordinates: ", action.x, action.y, action.w, action.h)
                     await browserController.click(page, _x, _y);
@@ -457,7 +463,8 @@ async function executeActions(actions, browserController, privateData, parentTra
 
                 // click
                 if (action.x !== undefined && action.y !== undefined) {
-                    const _x = action.x + action.w / 2
+                  console.log("---------undefined 2---------")  
+                  const _x = action.x + action.w / 2
                     const _y = action.y + action.h / 2
                     await browserController.click(page, _x, _y);
                     // actionLogs.push(`performed 'click' with params { id : ${action.id}, tab: ${action.tabOnWhichToPerform} }`);
@@ -524,7 +531,7 @@ async function executeActions(actions, browserController, privateData, parentTra
         }
 
         // Optional delay between actions
-        await browserController.wait(1000);
+        await browserController.wait(3000);
         await browserController.syncPageData();
     }
 
