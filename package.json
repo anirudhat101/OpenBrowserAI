@@ -12,11 +12,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/openbrowserai.git"
+    "url": "git+https://github.com/anirudhat101/OpenBrowserAI.git"
   },
   "keywords": ["browser", "ai", "automation", "agent", "cli"],
   "author": "",
-  "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "@cerebras/cerebras_cloud_sdk": "^1.59.0",

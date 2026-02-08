@@ -37,7 +37,7 @@ export default function Home() {
             </a>
 
             <a
-              href="https://github.com/yourusername/openbrowserai"
+              href="https://github.com/anirudhat101/OpenBrowserAI"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-700 transition hover:bg-slate-50"
@@ -125,26 +125,16 @@ export default function Home() {
           </p>
 
           <div className="aspect-video overflow-hidden rounded-xl bg-slate-800">
-            <div className="flex h-full items-center justify-center">
-              <div className="text-center">
-                <Play className="mx-auto mb-4 h-16 w-16 text-slate-600" />
-                <p className="text-slate-500">Demo video placeholder</p>
-                <p className="mt-2 text-sm text-slate-600">
-                  Replace with YouTube / Loom / MP4
-                </p>
-              </div>
-            </div>
+            <iframe
+              src="https://drive.google.com/file/d/1H8ocpMhVtr5twvEHcH1OkLC8-s3eQDKa/preview"
+              width="100%"
+              height="100%"
+              allow="autoplay"
+              className="border-0"
+            />
           </div>
 
-          <a
-            href="https://your-demo-link.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-8 inline-flex items-center gap-2 text-blue-400 transition hover:text-blue-300"
-          >
-            <ExternalLink className="h-4 w-4" />
-            Try the Live Demo
-          </a>
+
         </div>
       </section>
 
@@ -152,30 +142,20 @@ export default function Home() {
       <section className="px-4 py-16">
         <div className="mx-auto max-w-4xl">
           <h2 className="mb-12 text-center text-3xl font-bold text-slate-900">
-            How It Works
+            How to Try It
           </h2>
 
           <div className="space-y-6">
             {[
               {
                 step: 1,
-                title: "Describe Your Cause",
-                desc: "Users describe the social or environmental causes they care about.",
+                title: "Install the CLI",
+                desc: "npm install -g https://github.com/anirudhat101/OpenBrowserAI.git",
               },
               {
                 step: 2,
-                title: "AI Browses the Web",
-                desc: "OpenBrowser AI navigates real platforms to discover relevant initiatives.",
-              },
-              {
-                step: 3,
-                title: "Match & Apply",
-                desc: "The agent filters, applies, and connects users automatically.",
-              },
-              {
-                step: 4,
-                title: "Create Real Impact",
-                desc: "Users join communities and take meaningful real-world action.",
+                title: "Run Your First Command",
+                desc: 'OpenBrowserAI "find education wellness volunteer program in US"',
               },
             ].map((item) => (
               <div
@@ -189,7 +169,9 @@ export default function Home() {
                   <h3 className="text-lg font-semibold text-slate-900">
                     {item.title}
                   </h3>
-                  <p className="text-slate-600">{item.desc}</p>
+                  <code className="mt-2 block rounded bg-slate-100 px-3 py-2 text-sm text-slate-700">
+                    {item.desc}
+                  </code>
                 </div>
               </div>
             ))}
@@ -209,7 +191,7 @@ export default function Home() {
           </p>
 
           <a
-            href="https://github.com/yourusername/openbrowserai"
+            href="https://github.com/anirudhat101/OpenBrowserAI"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-4 font-bold text-blue-600 transition hover:bg-blue-50"

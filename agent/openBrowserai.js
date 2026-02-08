@@ -15,10 +15,15 @@ const {
     captchaWaitcli
 } = require('./browser.js')
 
-const { Opik, disableLogger} = require("opik");
-const opikClient = new Opik();
+const { isOpikEnabled } = require('./utils/opikConfig');
 
-disableLogger();
+let Opik, disableLogger, opikClient;
+
+if (isOpikEnabled()) {
+  ({ Opik, disableLogger } = require("opik"));
+  opikClient = new Opik();
+  disableLogger();
+}
 
 async function OpenBrowserAI(task, privateData = {}){
   // const task = "check the price of eth on coingecko. if its price is greater than $6000 then open trading view chart of eth/usdt binace perp. else check price of BTC on coinmarketcap and see it its price is greater than $100000 if yes then open btc goolgle price page else open excalidraw."
@@ -45,11 +50,14 @@ async function OpenBrowserAI(task, privateData = {}){
   const pageDataList = []
   let currentUrl = ""
 
-  const trace = opikClient.trace({
+  const trace = opikClient ? opikClient.trace({
     name: "Browser Task",
     input: { task },
     tags: ["browser-automation"]
-  });
+  }) : {
+    span: () => ({ end: () => {} }),
+    end: () => {}
+  };
 
   let firstRes = await executeActions([{type: "openNewTab"}], b, privateData, trace)
   let browserState = b.getBrowserState();
@@ -210,7 +218,9 @@ async function OpenBrowserAI(task, privateData = {}){
       information_gathered: information_gather_so_far
     }
   });
-  await opikClient.flush();
+  if (opikClient) {
+    await opikClient.flush();
+  }
 
   return finalAnswer 
 }

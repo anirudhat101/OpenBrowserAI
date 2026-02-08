@@ -236,9 +236,9 @@ class BrowserController {
 async initialize(headless = false) {
 
         this.browser = await chromium.launch({ 
-          channel:"chrome",
+          // channel:"chrome",
           headless: headless,
-          executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+          // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
           args: [
             "--disable-blink-features=AutomationControlled"
             // '--disable-web-security',               // Disable CORS
