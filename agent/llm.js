@@ -162,7 +162,7 @@ async function gemini(prompt, visionData = {useVision : false, image: null}, par
   
 
   let llm;
-  const provider = process.env.LLM_PROVIDER || 'gemini';
+  const provider = process.env.LLM_PROVIDER || 'cera';
   if(process.env.ENABLE_LOGS)console.log("Provider detected:", provider);
   let text = "";
 
