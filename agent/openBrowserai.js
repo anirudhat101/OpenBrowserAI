@@ -15,17 +15,17 @@ const {
     captchaWaitcli
 } = require('./browser.js')
 
-const { Opik } = require("opik");
+const { Opik, disableLogger} = require("opik");
 const opikClient = new Opik();
 
-async function OpenBrowserAI(task){
+disableLogger();
+
+async function OpenBrowserAI(task, privateData = {}){
   // const task = "check the price of eth on coingecko. if its price is greater than $6000 then open trading view chart of eth/usdt binace perp. else check price of BTC on coinmarketcap and see it its price is greater than $100000 if yes then open btc goolgle price page else open excalidraw."
   // const task = "check the price of eth on coingecko then check price on coinmarketcap"
   // const task = "Find a volunteer opportunity for beach cleanup in Mumbai"
   const useVision = true
   let isDone = false 
-  const privateData ={
-  }
   
   let pageData =""
   let information_gather_so_far =""
@@ -68,7 +68,7 @@ async function OpenBrowserAI(task){
   let finalAnswer
   while (!isDone){
     stepsCounter++
-    console.log("creating prompt")
+    if(process.env.ENABLE_LOGS)console.log("creating prompt")
 
     const stepSpan = trace.span({
       name: `Step ${stepsCounter}`,
@@ -83,12 +83,12 @@ async function OpenBrowserAI(task){
     
     
     await saveToTxtFile("prompt"+stepsCounter.toString()+".txt", prompt)
-    console.log("call gemini ")
+    if(process.env.ENABLE_LOGS)console.log("call gemini ")
     
     const res = await gemini(prompt, visionData, stepSpan)
     
-    console.log("gemini Done")
-    console.log("res ",res  )
+    if(process.env.ENABLE_LOGS)console.log("gemini Done")
+    if(process.env.ENABLE_LOGS)console.log("res ",res  )
     if(res.isWholegoalFinish){
       stepSpan.end({ output: { status: "completed" } });
       isDone = true
@@ -100,13 +100,13 @@ async function OpenBrowserAI(task){
     // }
     {
       if(res.isCaptcha){
-        console.log("Captcha detected. Waiting for user confirmation...");
+        if(process.env.ENABLE_LOGS)console.log("Captcha detected. Waiting for user confirmation...");
         await captchaWaitcli();
       }
       else {
         
         if(res.actions[0]?.x){
-          console.log({ x: res.actions[0].x, y: res.actions[0].y, w: res.actions[0].w, h: res.actions[0].h })
+          if(process.env.ENABLE_LOGS)console.log({ x: res.actions[0].x, y: res.actions[0].y, w: res.actions[0].w, h: res.actions[0].h })
           await highlightBox(b.pages[pageNo-1], { x: res.actions[0].x, y: res.actions[0].y, w: res.actions[0].w, h: res.actions[0].h });
           // function sleep(ms) {
           //   return new Promise(resolve => setTimeout(resolve, ms));
@@ -151,7 +151,7 @@ async function OpenBrowserAI(task){
         pageNo = _pageno
         
         // await b.pages[pageNo-1].bringToFront(); // todo : remove (we should listen to new page addition state change)
-        console.log("performed")
+        if(process.env.ENABLE_LOGS)console.log("performed")
 
       }
   
@@ -180,7 +180,7 @@ async function OpenBrowserAI(task){
       const pageDataRes = createPageDataPrompt(pageDataInCsv, askedChunk)
       pageData = pageDataRes.pageDataStr
       
-      // console.log('---- askedChunk --- ', askedChunk, pageData)
+      // if(process.env.ENABLE_LOGS)console.log('---- askedChunk --- ', askedChunk, pageData)
       isChunkActionAvailable = pageDataRes.isChunkActionAvailable
       information_gather_so_far = information_gather_so_far + " " + res.information_gather_so_far;
       previousTaskOutcome = res.previousTaskOutcome
@@ -200,7 +200,7 @@ async function OpenBrowserAI(task){
 
   }
 
-  console.log("executed the task")
+  if(process.env.ENABLE_LOGS)console.log("executed the task")
 
   trace.end({
     output: { 
@@ -221,7 +221,7 @@ async function measureTime(fn) {
   const result = await fn();
 
   const end = Date.now();
-  console.log(`Time taken: ${end - start} ms`);
+  if(process.env.ENABLE_LOGS)console.log(`Time taken: ${end - start} ms`);
 
   return result;
 }

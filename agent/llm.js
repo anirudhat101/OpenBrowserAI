@@ -7,11 +7,10 @@ const fs = require('fs');
 const path = require('path');
 dotenv.config();
 
-
 const Cerebras = require('@cerebras/cerebras_cloud_sdk');
 
 const cerebras = new Cerebras({
-  apiKey: process.env['CEREBRAS_API_KEY']
+  apiKey: "csk-955nvd56x89nvdh2n62ervffvv4k9pfkd5jdndp9kwyte3yj", // key added so that tester can easily test it //process.env['CEREBRAS_API_KEY']
 });
 
 async function cere(prompt, visionData, parentTrace) {
@@ -54,7 +53,7 @@ function convertPrompt(res1) {
   // const res1 ={action, summary, infoCollected, status}
   const isWholegoalFinish = res1.status === "completed";
 
-  // console.log("action ",action)
+  // if(process.env.ENABLE_LOGS)console.log("action ",action)
 
   function mapAction(action) {
     if (!action) return [];
@@ -154,17 +153,17 @@ function saveObjectToJsonFile(obj, filename) {
   // Save file
   fs.writeFileSync(filePath, json, "utf-8");
 
-  console.log("Saved:", filePath);
+  if(process.env.ENABLE_LOGS)console.log("Saved:", filePath);
 }
 
 async function gemini(prompt, visionData = {useVision : false, image: null}, parentTrace) {
-  console.log("gemini1", prompt.length);
+  if(process.env.ENABLE_LOGS)console.log("gemini1", prompt.length);
 
   
 
   let llm;
   const provider = process.env.LLM_PROVIDER || 'gemini';
-  console.log("Provider detected:", provider);
+  if(process.env.ENABLE_LOGS)console.log("Provider detected:", provider);
   let text = "";
 
     // await saveObjectToJsonFile({prompt:prompt}, "zzz.json")
@@ -175,7 +174,7 @@ async function gemini(prompt, visionData = {useVision : false, image: null}, par
 
     } else
       if (provider === 'huggingface') {
-    console.log("Using Hugging Face");
+    if(process.env.ENABLE_LOGS)console.log("Using Hugging Face");
     const { HfInference } = require('@huggingface/inference');
     
     const hf = new HfInference(process.env.HF_TOKEN || process.env.HUGGINGFACE_API_KEY);
@@ -218,12 +217,12 @@ async function gemini(prompt, visionData = {useVision : false, image: null}, par
     // await saveObjectToJsonFile(completion,"hfinstruct.json")
     
 
-    console.log(" completion?.choices?.[0]?.message ::", completion?.choices?.[0])
-    console.log(" completion?.choices?.[0]?.message ::", completion?.choices?.[0]?.message)
+    if(process.env.ENABLE_LOGS)console.log(" completion?.choices?.[0]?.message ::", completion?.choices?.[0])
+    if(process.env.ENABLE_LOGS)console.log(" completion?.choices?.[0]?.message ::", completion?.choices?.[0]?.message)
     text = completion?.choices?.[0]?.message?.content || "";
   } else
   if (provider === 'openrouter') {
-    console.log("Using OpenRouter");
+    if(process.env.ENABLE_LOGS)console.log("Using OpenRouter");
     const client = new OpenRouter({
       apiKey: process.env.OR || process.env.OPENROUTER_API_KEY,
     });
@@ -252,7 +251,7 @@ async function gemini(prompt, visionData = {useVision : false, image: null}, par
     text = completion?.choices?.[0]?.message?.content || "";
 
   } else {
-    console.log("Using Gemini");
+    if(process.env.ENABLE_LOGS)console.log("Using Gemini");
     llm = new ChatGoogleGenerativeAI({
       // model: "gemini-flash-latest",
       model:"gemini-3-flash-preview", 
@@ -279,16 +278,16 @@ async function gemini(prompt, visionData = {useVision : false, image: null}, par
 
     );
 
-    console.log("gemini2");
+    if(process.env.ENABLE_LOGS)console.log("gemini2");
     text = response.content;
   }
 
   text = text.replace(/```json|```/g, '').trim();
-  console.log("gemini3");
+  if(process.env.ENABLE_LOGS)console.log("gemini3");
 
   let jsonObject = JSON.parse(text);
   jsonObject = convertPrompt(jsonObject)
-  console.log("gemini4");
+  if(process.env.ENABLE_LOGS)console.log("gemini4");
 
   if (parentTrace) {
     const span = parentTrace.span({

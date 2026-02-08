@@ -20,6 +20,10 @@ function createPrompt(pageData, task, information_gather_so_far, previousTaskOut
   // vision section
   const needVision= "if you think you need scrrenshot of this page then you can use the 'screenshot' action."
 
+  function getUTCTime() {
+    return new Date().toISOString();
+  }
+
 // Add tab information to prompt
   const tabInfo = browserState ? `
   TAB INFORMATION:
@@ -37,6 +41,8 @@ function createPrompt(pageData, task, information_gather_so_far, previousTaskOut
 
   ${privateData} – optional credentials (private key strings)
 
+  Todays date Time : ${getUTCTime()}
+
   Page data format
   Page data is in csv. (html format is converted to csv)
 
@@ -50,7 +56,7 @@ function createPrompt(pageData, task, information_gather_so_far, previousTaskOut
   1,"Gmail","https://mail.google.com/mail/&ogbl","","Gmail ",1
   example ends here.
 
-  
+
   ${tabInfo}
   The current browser Tab ${current_tab} page data you can interact with :(Page data starts here)
 
@@ -75,6 +81,8 @@ function createPrompt(pageData, task, information_gather_so_far, previousTaskOut
       "answer":"string" //final answer ONLY if status is completed else empty
   }
 
+${guidePrompt}
+
   Critical rules
 
   Only interact with interactive elements (input, button, select, textarea, a).
@@ -89,48 +97,46 @@ function createPrompt(pageData, task, information_gather_so_far, previousTaskOut
   ${needVision}
   No narrative text, comments, or deviation from the JSON schema.
   No additional fields.
-  Output only the JSON defined above.DO NOT include anything outside the JSON object. No comments, explanations, or extra keys.` + guidePrompt 
+  Output only the JSON defined above.DO NOT include anything outside the JSON object. No comments, explanations, or extra keys.` 
 
     return prompt;
 }
-// - https://www.idealist.org
-const guidePrompt = `You are a social and community impact browser agent.
 
-When a user asks about volunteering, social impact, community initiatives, or environmental action, you MUST actively browse trusted volunteer platforms to find real opportunities.
-in those cases always start with these sites:
-Primary platforms to use:
-- https://www.volunteermatch.org
-- https://www.unv.org (UN Volunteers)
 
-- https://www.catchafire.org
-- https://www.allforgood.org
-- https://www.redcross.org
+const guidePrompt = `You are a browser-based research agent.
 
-Instructions:
-1. Identify the user’s intent (cause/topic) and location from the query.
-2. Choose the most relevant one or two platforms from the list above.
-3. Search the platform using the topic (e.g., environment, education, animal welfare) and the location.
-4. Find currently available, real volunteer opportunities.
-5. Extract only the most relevant opportunity for the user.
-6. Present actionable details:
-   - Organization name
-   - Type of volunteering
-   - Location or remote option
-   - How to apply or participate
-7. Avoid generic advice or fabricated information. Verify details through browsing.
-dont overtoptimized the search. try to get few opportunities.
-If no suitable opportunity is found, clearly state what was searched and suggest the closest alternative.`
+When the user’s query or task is related to social and community impact — especially topics like:
 
-// `If the user’s request is related to volunteering, social impact, community initiatives, environmental action, or helping a cause:
+finding volunteer programs
 
-// - Prefer searching trusted global volunteer platforms such as:
-//   Idealist, VolunteerMatch, UN Volunteers , Catchafire, All for Good, or Red Cross.
-// - Select one or two platforms that best match the user’s intent (location, skills, cause).
-// - Actively browse these platforms to find real, current opportunities.
-// - Extract actionable details (what the volunteer does, where, time commitment, and how to join).
-// - Avoid generic advice. Prioritize opportunities that a user can realistically act on.
-// give  2-3 opportunity if user dont mention the quantity.  
-// If no suitable opportunity is found, explain clearly what was checked and suggest the closest alternative.`
+community initiatives
+
+NGOs, social causes, environmental or educational programs
+
+follow these steps:
+
+Search on Google for relevant and active volunteer or community programs related to the user’s query.
+
+Identify 2 genuine opportunities that are:
+
+currently active or upcoming
+
+relevant to the user’s intent
+
+from credible sources (NGOs, official websites, trusted platforms)
+
+Open the result pages and extract the following details for each opportunity:
+
+Title of the program
+
+Date / duration (or clearly state “Ongoing” if no date is mentioned)
+
+Location (online / city / country)
+
+Official link
+
+Return the final answer in a clear, structured format, without extra commentary.`
+
 
 module.exports = {
     createPrompt

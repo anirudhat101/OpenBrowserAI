@@ -19,10 +19,10 @@ async function captchaWaitcli() {
     ]);
 
     if (answers.captchaSolved) {
-      console.log("Proceeding...");
+      if(process.env.ENABLE_LOGS)console.log("Proceeding...");
       return;
     }
-    console.log("Waiting... Solve the CAPTCHA, then confirm.");
+    if(process.env.ENABLE_LOGS)console.log("Waiting... Solve the CAPTCHA, then confirm.");
   }
 }
 
@@ -267,13 +267,13 @@ setupEventListeners() {
 
         // Listen for new pages being created (new tabs)
         this.context.on('page', (page) => {
-            console.log('New page created:', page.url());
+            if(process.env.ENABLE_LOGS)console.log('New page created:', page.url());
             this.syncPageData();
         });
 
         // Listen for pages being closed
         this.context.on('pageclose', (page) => {
-            console.log('Page closed:', page.url());
+            if(process.env.ENABLE_LOGS)console.log('Page closed:', page.url());
             this.syncPageData();
         });
 
@@ -294,7 +294,7 @@ setupEventListeners() {
             this.activePage = Math.max(0, this.pages.length - 1);
         }
         
-        console.log(`Synced: ${this.pages.length} pages, active tab: ${this.activePage + 1}`);
+        if(process.env.ENABLE_LOGS)console.log(`Synced: ${this.pages.length} pages, active tab: ${this.activePage + 1}`);
         return { pageCount: this.pages.length, activePage: this.activePage };
     }
 
@@ -310,7 +310,7 @@ setupEventListeners() {
         if (tabIndex >= 0 && tabIndex < this.pages.length) {
             this.activePage = tabIndex;
             await this.pages[tabIndex].bringToFront();
-            console.log(`Switched to tab ${tabIndex + 1}`);
+            if(process.env.ENABLE_LOGS)console.log(`Switched to tab ${tabIndex + 1}`);
             return true;
         }
         return false;
@@ -333,7 +333,7 @@ async createNewTab(url=null) {
       this.activePage = this.pages.length - 1;
       await _page.bringToFront();
       
-      console.log(`Created new tab, now on tab ${this.activePage + 1}`);
+      if(process.env.ENABLE_LOGS)console.log(`Created new tab, now on tab ${this.activePage + 1}`);
       return this.activePage + 1; // Return 1-based tab number
     }
 
@@ -363,12 +363,34 @@ async createNewTab(url=null) {
 
             // const data = await getCompressedElements(this.page)
             
-            // console.log(JSON.stringify(data, null, 2));
+            // if(process.env.ENABLE_LOGS)console.log(JSON.stringify(data, null, 2));
         // }
     }
 
-    async click(page, x, y, button = 'left') {
-      
+    async click(page, x, y, button = 'left', delayMs = 1000) {
+      // draw marker
+  await page.evaluate(({ x, y }) => {
+    const dot = document.createElement('div');
+    dot.style.position = 'fixed';
+    dot.style.left = `${x - 5}px`;
+    dot.style.top = `${y - 5}px`;
+    dot.style.width = '10px';
+    dot.style.height = '10px';
+    dot.style.background = 'red';
+    dot.style.borderRadius = '50%';
+    dot.style.zIndex = '999999';
+    dot.id = '__pw_click_marker__';
+    document.body.appendChild(dot);
+  }, { x, y });
+
+  // wait so YOU can see it
+  await page.waitForTimeout(delayMs);
+
+  // remove marker
+  await page.evaluate(() => {
+    document.getElementById('__pw_click_marker__')?.remove();
+  });
+
         // const el = page.locator(`#${CSS.escape(id)}`);
         // await el.click();
         // await page.waitForLoadState("domcontentloaded");
@@ -440,10 +462,10 @@ async function executeActions(actions, browserController, privateData, parentTra
                 page = browserController.pages[action.tabOnWhichToPerform -1 ]
                 pageNo = action.tabOnWhichToPerform 
                 if (action.x !== undefined && action.y !== undefined) {
-                  console.log("---------undefined---------")    
+                  if(process.env.ENABLE_LOGS)console.log("---------undefined---------")    
                   const _x = action.x + action.w / 2
                     const _y = action.y + action.h / 2
-                    console.log("click cordinates: ", action.x, action.y, action.w, action.h)
+                    if(process.env.ENABLE_LOGS)console.log("click cordinates: ", action.x, action.y, action.w, action.h)
                     await browserController.click(page, _x, _y);
                     actionLogs.push(`performed 'click' with params { id : ${action.id}, tab: ${action.tabOnWhichToPerform} }`);
                 }
@@ -463,7 +485,7 @@ async function executeActions(actions, browserController, privateData, parentTra
 
                 // click
                 if (action.x !== undefined && action.y !== undefined) {
-                  console.log("---------undefined 2---------")  
+                  if(process.env.ENABLE_LOGS)console.log("---------undefined 2---------")  
                   const _x = action.x + action.w / 2
                     const _y = action.y + action.h / 2
                     await browserController.click(page, _x, _y);
@@ -502,7 +524,7 @@ async function executeActions(actions, browserController, privateData, parentTra
                 }
                 const newTabNumber = await browserController.createNewTab(action.url);
                 pageNo = newTabNumber;
-                console.log("pageNo ", pageNo)
+                if(process.env.ENABLE_LOGS)console.log("pageNo ", pageNo)
                 actionLogs.push(`performed 'openNewTab' with params { newTabNumber: ${pageNo} }`);
                 if (span) span.end({ output: { success: true, newTabNumber } });
                 break;
@@ -531,7 +553,7 @@ async function executeActions(actions, browserController, privateData, parentTra
         }
 
         // Optional delay between actions
-        await browserController.wait(3000);
+        await browserController.wait(1500);
         await browserController.syncPageData();
     }
 
@@ -604,7 +626,7 @@ async function markBoundingBoxes(page, elements) {
 
 function elementsToPromptCSVChunks(elements, part = 0) {
   const pagedataLimit = 100000;
-  const header = "id,text,href,role,ariaLabel,interactive\n";
+  const header = "id,text,href,role,ariaLabel,interactive,tag\n";
   
   const chunks = [];
   let currentChunk = header;
@@ -617,7 +639,8 @@ function elementsToPromptCSVChunks(elements, part = 0) {
       escape(el.href || ''),
       escape(el.role || ''),
       escape(el.ariaLabel || el['aria-label'] || ''),
-      el.interactive ? 1 : 0
+      el.interactive ? 1 : 0,
+      el.tag ?? ''
     ].join(',') + '\n';
     
     // Check if adding this row would exceed the limit
