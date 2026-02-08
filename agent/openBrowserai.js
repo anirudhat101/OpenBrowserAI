@@ -54,10 +54,7 @@ async function OpenBrowserAI(task, privateData = {}){
     name: "Browser Task",
     input: { task },
     tags: ["browser-automation"]
-  }) : {
-    span: () => ({ end: () => {} }),
-    end: () => {}
-  };
+  }) : null;
 
   let firstRes = await executeActions([{type: "openNewTab"}], b, privateData, trace)
   let browserState = b.getBrowserState();
@@ -78,11 +75,14 @@ async function OpenBrowserAI(task, privateData = {}){
     stepsCounter++
     if(process.env.ENABLE_LOGS)console.log("creating prompt")
 
-    const stepSpan = trace.span({
-      name: `Step ${stepsCounter}`,
-      input: { step: stepsCounter, pageNo },
-      type: "general"
-    });
+    let stepSpan = null;
+    if (trace) {
+      stepSpan = trace.span({
+        name: `Step ${stepsCounter}`,
+        input: { step: stepsCounter, pageNo },
+        type: "general"
+      });
+    }
 
     if(stepsCounter == 1)compressedElement = await getCompressedElements(b.pages[pageNo-1])
 
@@ -98,7 +98,7 @@ async function OpenBrowserAI(task, privateData = {}){
     if(process.env.ENABLE_LOGS)console.log("gemini Done")
     if(process.env.ENABLE_LOGS)console.log("res ",res  )
     if(res.isWholegoalFinish){
-      stepSpan.end({ output: { status: "completed" } });
+      if (stepSpan) stepSpan.end({ output: { status: "completed" } });
       isDone = true
       finalAnswer = res.answer
       break
@@ -195,7 +195,7 @@ async function OpenBrowserAI(task, privateData = {}){
       summary = summary + " " + res.Summary
       browserState = b.getBrowserState();
       
-      stepSpan.end({ output: { actions: res.actions, status: "in_progress" } });
+      if (stepSpan) stepSpan.end({ output: { actions: res.actions, status: "in_progress" } });
       // tabSummary = `Tabs open: ${currentBrowserState.totalTabs}. Active tab: ${currentBrowserState.activeTabNumber}. Tab details: ${currentBrowserState.pages.map(tab => `Tab ${tab.number}: ${tab.url}`).join(', ')}`;
       // if (res.tabSummary) {
       //   tabSummary += ` | ${res.tabSummary}`;
@@ -210,14 +210,16 @@ async function OpenBrowserAI(task, privateData = {}){
 
   if(process.env.ENABLE_LOGS)console.log("executed the task")
 
-  trace.end({
-    output: { 
-      success: true,
-      steps: stepsCounter,
-      final_summary: summary,
-      information_gathered: information_gather_so_far
-    }
-  });
+  if (trace) {
+    trace.end({
+      output: { 
+        success: true,
+        steps: stepsCounter,
+        final_summary: summary,
+        information_gathered: information_gather_so_far
+      }
+    });
+  }
   if (opikClient) {
     await opikClient.flush();
   }

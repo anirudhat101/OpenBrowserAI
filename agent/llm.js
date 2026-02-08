@@ -15,13 +15,7 @@ const cerebras = new Cerebras({
 
 async function cere(prompt, visionData, parentTrace) {
   let span;
-  // if (parentTrace) {
-  //   span = parentTrace.span({
-  //     name: "Cerebras LLM Call",
-  //     input: { prompt: prompt.substring(0, 1000), useVision: visionData.useVision },
-  //     type: "llm"
-  //   });
-  // }
+
 
   const completion = await cerebras.chat.completions.create({
     messages: [
@@ -162,7 +156,7 @@ async function gemini(prompt, visionData = {useVision : false, image: null}, par
   
 
   let llm;
-  const provider = process.env.LLM_PROVIDER || 'cera';
+  const provider = process.env.LLM_PROVIDER || 'gemini';
   if(process.env.ENABLE_LOGS)console.log("Provider detected:", provider);
   let text = "";
 
