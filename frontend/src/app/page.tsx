@@ -161,7 +161,7 @@ export default function Home() {
               {
                 step: 3,
                 title: "Run Your First Command",
-                desc: 'OpenBrowserAI "find education wellness volunteer program in US"',
+                desc: 'openbrowserai "find education wellness volunteer program in US"',
               },
             ].map((item) => (
               <div
