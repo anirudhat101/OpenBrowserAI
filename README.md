@@ -20,6 +20,12 @@ Watch the demo video: [OpenBrowserAI Demo](https://drive.google.com/file/d/1H8oc
 ```bash
 npx playwright install  
 ```
+if you get an issue in above command then only do this:
+
+```bash
+npm init -y  
+npx playwright install  
+```
 
 ### Using Global CLI (if installed globally)
 
@@ -217,3 +223,4 @@ node opik/evaluate.js
   ├── [Span: Step 2] → [Span: LLM Call] → Actions
   └── ...until task complete
 ```
+
