@@ -5,6 +5,7 @@ import {
   Sparkles,
   Github,
   ExternalLink,
+  ArrowRight,
 } from "lucide-react";
 
 export default function Home() {
@@ -29,11 +30,11 @@ export default function Home() {
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
-              href="#demo"
+              href="#try-it"
               className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
             >
-              <Play className="h-5 w-5" />
-              Watch Demo
+              <ArrowRight className="h-5 w-5" />
+              Try it out
             </a>
 
             <a
@@ -139,7 +140,7 @@ export default function Home() {
       </section>
 
       {/* How it Works */}
-      <section className="px-4 py-16">
+      <section id="try-it" className="px-4 py-16">
         <div className="mx-auto max-w-4xl">
           <h2 className="mb-12 text-center text-3xl font-bold text-slate-900">
             How to Try It
@@ -150,10 +151,15 @@ export default function Home() {
               {
                 step: 1,
                 title: "Install the CLI",
-                desc: "npm install -g https://github.com/anirudhat101/OpenBrowserAI.git",
+                desc: "npm install -g openbrowseraicli@latest",
               },
               {
                 step: 2,
+                title: "Install Playwright",
+                desc: "npx playwright install",
+              },
+              {
+                step: 3,
                 title: "Run Your First Command",
                 desc: 'OpenBrowserAI "find education wellness volunteer program in US"',
               },

@@ -14,6 +14,10 @@ Watch the demo video: [OpenBrowserAI Demo](https://drive.google.com/file/d/1H8oc
  npm install -g openbrowseraicli@latest
 ```
 
+```bash
+npx playwright install  
+```
+
 ### Using Global CLI (if installed globally)
 
 After global installation, you can run:
@@ -30,7 +34,11 @@ cd OpenBrowserAI
 npm install
 ```
 
-## Environment Variables (optional)
+```bash
+npx playwright install  
+```
+
+## Environment Variables (optional: unless you want to run opik integration and its evalution)
 
 Create a `.env` file in the root directory with the following variables:
 
