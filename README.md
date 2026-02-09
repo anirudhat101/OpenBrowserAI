@@ -24,6 +24,7 @@ if you get an issue in above command then only do this:
 
 ```bash
 npm init -y  
+npm i playwright
 npx playwright install  
 ```
 
@@ -223,4 +224,5 @@ node opik/evaluate.js
   ├── [Span: Step 2] → [Span: LLM Call] → Actions
   └── ...until task complete
 ```
+
 
