@@ -1,4 +1,4 @@
-# OpenBrowserAI - Open Source Browser AI Agent
+# OpenBrowserAI - Open Source Browser AI Agent For volunteer matching
 
 OpenBrowserAI is an AI agent that uses real browser automation to help people / volunteer discover, connect with, and take action on causes that matter to them.
 
@@ -11,7 +11,15 @@ Watch the demo video: [OpenBrowserAI Demo](https://drive.google.com/file/d/1H8oc
 ### Option 1: Install Globally via npm
 
 ```bash
-npm install -g https://github.com/anirudhat101/OpenBrowserAI.git
+ npm install -g openbrowseraicli@latest
+```
+
+### Using Global CLI (if installed globally)
+
+After global installation, you can run:
+
+```bash
+openbrowserai "find education wellness volunteer program in US"
 ```
 
 ### Option 2: Clone and Install Locally
@@ -22,46 +30,32 @@ cd OpenBrowserAI
 npm install
 ```
 
-## Environment Variables
+## Environment Variables (optional)
 
 Create a `.env` file in the root directory with the following variables:
-
-## Usage
-
-### Using Global CLI (if installed globally)
-
-After global installation, you can run:
-
-```bash
-OpenBrowserAI "find education wellness volunteer program in US"
-```
-
-### Using Local Installation
 
 If you cloned the repository:
 
 ```bash
 # Run directly
 node agent/cli.js "find education wellness volunteer program in US"
-
-# Or use npm
-npm start -- "find education wellness volunteer program in US"
 ```
+
 
 ## Example Commands
 
 ```bash
 # Find volunteer opportunities
-OpenBrowserAI "find education wellness volunteer program in US"
+openbrowserai "find education wellness volunteer program in US"
 
 # Search for environmental causes
-OpenBrowserAI "find environmental conservation projects near me"
+openbrowserai "find environmental conservation projects near me"
 
 # Look for community initiatives
-OpenBrowserAI "find community service opportunities in New York"
+openbrowserai "find community service opportunities in New York"
 
 # Discover social causes
-OpenBrowserAI "find food bank volunteer opportunities"
+openbrowserai "find food bank volunteer opportunities"
 ```
 
 ## Features
@@ -88,8 +82,8 @@ OpenBrowserAI/
 
 ## Evaluation
 
-To run the evaluation suite:
-
+To run the evaluation suite: 
+[note : you need to add opik env and configuration if you want to do the evalution].
 ```bash
 node opik/evaluate.js
 ```
