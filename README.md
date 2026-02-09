@@ -192,3 +192,28 @@ To run the evaluation suite:
 node opik/evaluate.js
 
 ```
+
+# Opik Tracing
+
+## What We Trace
+
+### 1. Browser Task (Trace)
+**When**: At task start  
+**What**: User input, final output, success status, step count
+
+### 2. Agent Steps (Spans)
+**When**: Each iteration of the agent loop  
+**What**: Step number, page number, actions taken, page state
+
+### 3. LLM Calls (Spans)
+**When**: Every LLM request  
+**What**: Prompt (truncated), provider used, response received, vision mode status
+
+## Trace Flow
+
+```
+[Trace: Browser Task]
+  ├── [Span: Step 1] → [Span: LLM Call] → Actions
+  ├── [Span: Step 2] → [Span: LLM Call] → Actions
+  └── ...until task complete
+```

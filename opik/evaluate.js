@@ -21,10 +21,52 @@ const opikClient = new Opik();
 async function runEvaluation() {
     const dataset = await opikClient.getOrCreateDataset("browser-tasks-2");
     
-    await dataset.insert([{
-        input: "Founder of etherum",
-        expected_output: "vitalik"
-    }]);
+    await dataset.insert([
+        {
+            input: "find environmental cleanup volunteer opportunities in California this weekend",
+            expected_output: "Title:, Date:, Location: California, Link:"
+        },
+        {
+            input: "find food bank volunteer programs in New York",
+            expected_output: "Food bank, New York, Volunteer, Link:"
+        },
+        {
+            input: "find online volunteering opportunities for mental health support",
+            expected_output: "Online, Mental Health, Volunteer, Apply"
+        },
+        {
+            input: "find education volunteer opportunities for teaching kids in the US",
+            expected_output: "Education, Teaching, Kids, United States, Link:"
+        },
+        {
+            input: "find disaster relief volunteer opportunities currently active",
+            expected_output: "Disaster Relief, Active, Volunteer, Organization, Link:"
+        },
+        {
+            input: "find community service volunteer opportunities near San Francisco",
+            expected_output: "Community Service, San Francisco, Volunteer, Location, Link:"
+        },
+        {
+            input: "find animal shelter volunteer opportunities in Texas",
+            expected_output: "Animal Shelter, Texas, Volunteer, Apply"
+        },
+        {
+            input: "find climate change or sustainability volunteer programs",
+            expected_output: "Climate, Sustainability, Volunteer Program, Link:"
+        },
+        {
+            input: "find volunteering opportunities for students with flexible hours",
+            expected_output: "Students, Flexible Hours, Volunteer, Apply"
+        },
+        {
+            input: "find global online volunteering opportunities",
+            expected_output: "Global, Online, Volunteer, Organization, Link:"
+        },
+        {
+            input: "Founder of etherum",
+            expected_output: "vitalik"
+        }
+    ]);
     
     const result = await evaluate({
         dataset,
