@@ -2,6 +2,9 @@
 
 OpenBrowserAI is an AI agent that uses real browser automation to help people / volunteer discover, connect with, and take action on causes that matter to them.
 
+<img width="1869" height="809" alt="image" src="https://github.com/user-attachments/assets/7c37ad2b-f5c4-418f-acaf-cff1b1ac5295" />
+
+
 ## Demo
 
 Watch the demo video: [OpenBrowserAI Demo](https://drive.google.com/file/d/1H8ocpMhVtr5twvEHcH1OkLC8-s3eQDKa/view?usp=sharing)
@@ -106,4 +109,5 @@ To run the evaluation suite:
 [note : you need to add opik env and configuration if you want to do the evalution].
 ```bash
 node opik/evaluate.js
+
 ```
