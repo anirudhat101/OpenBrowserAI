@@ -38,9 +38,21 @@ npm install
 npx playwright install  
 ```
 
-## Environment Variables (optional: unless you want to run opik integration and its evalution)
+Environment Variables (optional: unless you want to run opik integration and its evalution)
 
-Create a `.env` file in the root directory with the following variables:
+Create a `.env` file in the root directory as per .env.example file.
+
+```
+LLM_PROVIDER="cera" 
+
+OPIK_URL_OVERRIDE=
+OPIK_PROJECT_NAME=
+OPIK_API_KEY=
+OPIK_WORKSPACE=
+
+OPIK_DISABLED=
+```
+
 
 If you cloned the repository:
 
