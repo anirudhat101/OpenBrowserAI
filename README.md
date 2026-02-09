@@ -86,6 +86,12 @@ openbrowserai "find food bank volunteer opportunities"
 1. Social & Community Impact
 2. Best Use of Opik
 
+## Architecture
+```
+User Task → Agent Loop → LLM → Browser Actions → Output
+                ↑_________________↓
+                    (feedback loop)
+```
 
 ## How It Works
 
@@ -144,14 +150,6 @@ OPIK_API_KEY=your_key
 OPIK_WORKSPACE=your_workspace
 OPIK_PROJECT_NAME=OpenBrowserAI
 ```
-
-## Architecture
-```
-User Task → Agent Loop → LLM → Browser Actions → Output
-                ↑_________________↓
-                    (feedback loop)
-```
-
 
 ## Why This Matters
 
