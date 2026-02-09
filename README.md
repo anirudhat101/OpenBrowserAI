@@ -81,6 +81,89 @@ openbrowserai "find community service opportunities in New York"
 openbrowserai "find food bank volunteer opportunities"
 ```
 
+## Encode Track participation
+
+1. Social & Community Impact
+2. Best Use of Opik
+
+
+## How It Works
+
+### 1. Task Input
+User provides a natural language task (e.g., *"find education wellness volunteer program in US"*)
+
+### 2. Agent Loop
+The agent runs an iterative loop until the task is complete:
+- **Observe**: Captures current page state (elements, text, URL)
+- **Reason**: LLM analyzes the page and decides next actions
+- **Act**: Executes actions (click, type, navigate, screenshot)
+- **Learn**: Updates context with gathered information
+
+### 3. Browser Actions
+- Navigate to URLs
+- Click elements by ID
+- Type text into forms
+- Take screenshots (vision mode)
+- Open/manage multiple tabs
+- Extract page data in chunks
+
+### 4. Multi-LLM Support
+Works with Gemini, Cerebras, OpenRouter, and HuggingFace models
+
+## Opik Integration
+
+### Tracing
+Opik tracks the entire browser session:
+- **Trace**: One trace per browser task with input/output
+- **Spans**: Each step of the agent loop is a span
+- **LLM Spans**: Every LLM call is tracked with prompt and response
+
+```javascript
+const trace = opikClient.trace({
+  name: "Browser Task",
+  input: { task },
+  tags: ["browser-automation"]
+});
+```
+
+### Evaluation
+Run automated evaluations:
+```bash
+node opik/evaluate.js
+```
+
+Metrics tracked:
+- Task Success Rate
+- Step Efficiency
+- Execution Quality
+
+### Configuration
+Set environment variables to enable:
+```
+OPIK_API_KEY=your_key
+OPIK_WORKSPACE=your_workspace
+OPIK_PROJECT_NAME=OpenBrowserAI
+```
+
+## Architecture
+```
+User Task → Agent Loop → LLM → Browser Actions → Output
+                ↑_________________↓
+                    (feedback loop)
+```
+
+
+## Why This Matters
+
+Millions of people want to volunteer or contribute to social and environmental
+causes, but discovering trustworthy, relevant opportunities is time-consuming
+and fragmented across multiple platforms.
+
+OpenBrowserAI removes this friction by automatically browsing verified volunteer
+platforms and connecting people to real opportunities they can act on
+immediately.
+
+
 ## Features
 
 - **Real Browser Automation**: The AI agent browses real websites to find local and global community initiatives
